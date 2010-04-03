@@ -9,9 +9,10 @@
 
 juiz.depcheck({'util', "data"},{1,3})
 
-juiz.addccmd("kotc", {function (recp, sender, which, channel)
-    which = which or 'last' -- one of 'last', 'record' or 'current'
-    channel = recp --screw different channels
+juiz.addccmd("kotc", {function (recp, sender, msg)
+    local which, channel = unpack(util.explode(' ',msg or ''))
+    which = which or 'last' -- one of 'last', 'record'
+    channel = channel or recp
     local kotcdata = juiz.getdata("kotc-"..channel.."-"..which)
     util.msg("TRACE", "kotc request by %s %s", sender)
     if which ~= 'last' and which ~= 'record' then
@@ -39,7 +40,7 @@ function breaksilence(hook, sender, recp)
             juiz.setdata("kotc-"..recp..'-last', p)
         end
         local r = juiz.getdata("kotc-"..recp..'-record')
-        if not r or prevlength > r[4] then
+        if not r or prevlength > (r[4]-r[1]) then
             juiz.setdata("kotc-"..recp..'-record', p)
             juiz.say(recp, 'Congrats to %s, new KOTC record holder!', p[3])
         end
